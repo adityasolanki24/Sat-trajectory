@@ -538,34 +538,36 @@ Example space weather: {"title":"SPACE WEATHER ALERT","rationale":"Critical CME 
 })
 
 // NASA DONKI API proxy for space weather data
-app.get('/api/donki/*', async (req, res) => {
+const handleDonkiRequest = async (req: express.Request, res: express.Response, eventType: string) => {
   try {
-    const donkiPath = req.params[0]
-    const queryString = req.url.split('?')[1] || ''
-    const donkiUrl = `https://api.nasa.gov/DONKI/${donkiPath}?${queryString}&api_key=DEMO_KEY`
+    const { startDate, endDate } = req.query
+    const donkiUrl = `https://api.nasa.gov/DONKI/WS/get/${eventType}?startDate=${startDate}&endDate=${endDate}&api_key=DEMO_KEY`
     
-    console.log(`[DONKI] Fetching: ${donkiUrl}`)
+    console.log(`[DONKI] Fetching ${eventType}:`, donkiUrl)
     
     const response = await axios.get(donkiUrl, {
-      timeout: 10000,
+      timeout: 15000,
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'SatelliteTracker/1.0'
       }
     })
     
-    console.log(`[DONKI] Success: ${donkiPath}`)
+    console.log(`[DONKI] Success ${eventType}: ${response.data.length} events`)
     res.json(response.data)
   } catch (error: any) {
-    console.error('[DONKI] Proxy error:', error.message)
+    console.error(`[DONKI] ${eventType} error:`, error.message)
     if (error.response) {
       console.error('[DONKI] Response status:', error.response.status)
-      console.error('[DONKI] Response data:', error.response.data)
-      return res.status(error.response.status).json(error.response.data)
+      return res.status(error.response.status).json(error.response.data || { error: 'DONKI API error' })
     }
     res.status(500).json({ error: 'Failed to fetch space weather data', message: error.message })
   }
-})
+}
+
+app.get('/api/donki/WS/get/CME', (req, res) => handleDonkiRequest(req, res, 'CME'))
+app.get('/api/donki/WS/get/FLR', (req, res) => handleDonkiRequest(req, res, 'FLR'))
+app.get('/api/donki/WS/get/GST', (req, res) => handleDonkiRequest(req, res, 'GST'))
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true })
