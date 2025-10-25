@@ -33,13 +33,13 @@ export function SpaceWeatherMonitor({ onThreatDetected, onEventSelect, isVisible
       const toIso = (d: Date) => d.toISOString().split('T')[0]
       const params = `?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`
 
-      const cmeResponse = await fetch(`/api/donki/DONKI/WS/get/CME${params}`);
+      const cmeResponse = await fetch(`/api/donki/WS/get/CME${params}`);
       const cmeData = cmeResponse.ok ? await cmeResponse.json() : [];
       
-      const flareResponse = await fetch(`/api/donki/DONKI/WS/get/FLR${params}`);
+      const flareResponse = await fetch(`/api/donki/WS/get/FLR${params}`);
       const flareData = flareResponse.ok ? await flareResponse.json() : [];
       
-      const gstResponse = await fetch(`/api/donki/DONKI/WS/get/GST${params}`);
+      const gstResponse = await fetch(`/api/donki/WS/get/GST${params}`);
       const gstData = gstResponse.ok ? await gstResponse.json() : [];
       
       const processedEvents: SpaceWeatherEvent[] = [];
