@@ -1,9 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import ErrorBoundary from './components/ErrorBoundary'
+import App from './App'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootEl = document.getElementById('root')!
+const root = ReactDOM.createRoot(rootEl)
+
+root.render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary fullScreen>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>,
 )
