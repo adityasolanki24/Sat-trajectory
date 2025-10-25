@@ -130,7 +130,7 @@ export function calculateAvoidanceManeuver(
  * Based on orbital period and ground station passes
  */
 export function estimateManeuverWindow(
-  altitudeKm: number,
+  _altitudeKm: number, // Unused in current implementation
   timeToTcaMinutes: number
 ): {
   canManeuverNow: boolean;
