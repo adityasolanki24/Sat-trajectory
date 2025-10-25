@@ -4,13 +4,7 @@ Securely configure keys and credentials. Frontend uses Vite env vars; backend ke
 
 ## Frontend (Vite) – `.env.local`
 
-Create `Sat-trajectory/.env.local`:
-
-```
-VITE_N2YO_API_KEY=your_n2yo_key
-```
-
-Restart `npm run dev` after edits.
+No frontend keys are required for CelesTrak or NASA DONKI. If you add other sources, create `Sat-trajectory/.env.local` and restart dev.
 
 ## Backend (Express) – `.env`
 
@@ -41,10 +35,10 @@ Examples:
 
 - Space‑Track auth uses cookie jar; credentials never leave the server.
 - Celestrak JSON can miss TLE lines; the app falls back to `FORMAT=tle` and parses them.
-- N2YO requires `VITE_N2YO_API_KEY` in `.env.local`.
+ -
 
 ## Troubleshooting
 
 - `You must be logged in` → check `.env` and restart backend.
 - Port `5174` busy → stop extra backend processes.
-- N2YO key errors → set `VITE_N2YO_API_KEY` and restart frontend.
+ -

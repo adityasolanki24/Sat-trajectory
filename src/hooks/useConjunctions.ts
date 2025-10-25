@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchConjunctions, type CdmPublic } from '../services/spacetrack'
 
-type Conjunction = CdmPublic & { missDistanceMeters?: number; severity: 'red' | 'yellow' | 'green' }
+type Conjunction = CdmPublic & { missDistanceMeters?: number; severity: 'red' | 'yellow' | 'green'; missDistanceKm?: number; relativeSpeedKms?: number }
 
 function parseMissDistanceToMeters(value: unknown): number | undefined {
   if (typeof value === 'number') return value
@@ -31,18 +31,22 @@ export function useConjunctions(range: string = 'now-3') {
     fetchConjunctions(range)
       .then(resp => {
         if (!mounted) return
-        if (resp?.normalized && Array.isArray(resp.items)) {
-          const withSeverity: Conjunction[] = resp.items.map((it: any) => {
-            const md = typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters : parseMissDistanceToMeters(it.raw?.MISS_DISTANCE)
-            const severity: 'red' | 'yellow' | 'green' = md !== undefined ? (md < 1000 ? 'red' : md < 5000 ? 'yellow' : 'green') : 'green'
-            return { ...it, MISS_DISTANCE: it.missDistanceMeters ?? it.raw?.MISS_DISTANCE, missDistanceMeters: md, severity } as Conjunction
+        if (Array.isArray(resp)) {
+          const withSeverity: Conjunction[] = resp.map((it: any) => {
+            const mdKm = typeof it.missDistanceKm === 'number' ? it.missDistanceKm : (typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters / 1000 : undefined)
+            const rvKms = typeof it.relativeSpeedKms === 'number' ? it.relativeSpeedKms : undefined
+            const mdMeters = typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters : (typeof mdKm === 'number' ? mdKm * 1000 : parseMissDistanceToMeters(it?.raw?.MISS_DISTANCE))
+            const severity: 'red' | 'yellow' | 'green' = mdMeters !== undefined ? (mdMeters < 1000 ? 'red' : mdMeters < 5000 ? 'yellow' : 'green') : 'green'
+            return { ...it, missDistanceMeters: mdMeters, missDistanceKm: mdKm, relativeSpeedKms: rvKms, severity }
           })
           setData(withSeverity)
-        } else if (Array.isArray(resp)) {
-          const withSeverity: Conjunction[] = resp.map((item: any) => {
-            const md = parseMissDistanceToMeters(item.MISS_DISTANCE)
-            const severity: 'red' | 'yellow' | 'green' = md !== undefined ? (md < 1000 ? 'red' : md < 5000 ? 'yellow' : 'green') : 'green'
-            return { ...item, missDistanceMeters: md, severity }
+        } else if (resp?.normalized && Array.isArray(resp.items)) {
+          const withSeverity: Conjunction[] = resp.items.map((it: any) => {
+            const mdKm = typeof it.missDistanceKm === 'number' ? it.missDistanceKm : (typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters / 1000 : undefined)
+            const rvKms = typeof it.relativeSpeedKms === 'number' ? it.relativeSpeedKms : undefined
+            const mdMeters = typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters : (typeof mdKm === 'number' ? mdKm * 1000 : parseMissDistanceToMeters(it?.raw?.MISS_DISTANCE))
+            const severity: 'red' | 'yellow' | 'green' = mdMeters !== undefined ? (mdMeters < 1000 ? 'red' : mdMeters < 5000 ? 'yellow' : 'green') : 'green'
+            return { ...it, MISS_DISTANCE: it.missDistanceMeters ?? it.raw?.MISS_DISTANCE, missDistanceMeters: mdMeters, missDistanceKm: mdKm, relativeSpeedKms: rvKms, severity } as Conjunction
           })
           setData(withSeverity)
         } else {
@@ -51,7 +55,9 @@ export function useConjunctions(range: string = 'now-3') {
       })
       .catch(e => {
         if (!mounted) return
-        setError(String(e?.message || e))
+        console.warn('Conjunctions load failed, showing empty.', e)
+        setData([])
+        setError(null)
       })
       .finally(() => {
         if (!mounted) return

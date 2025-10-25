@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-interface SpaceWeatherEvent {
+export interface SpaceWeatherEvent {
   id: string;
   type: 'CME' | 'Solar Flare' | 'Geomagnetic Storm' | 'SEP';
   title: string;
@@ -8,13 +8,16 @@ interface SpaceWeatherEvent {
   severity: 'Low' | 'Medium' | 'High' | 'Critical';
   timestamp: string;
   impact?: string;
+  source?: any;
 }
 
-interface SpaceWeatherMonitorProps {
+export interface SpaceWeatherMonitorProps {
   onThreatDetected?: (event: SpaceWeatherEvent) => void;
+  onEventSelect?: (event: SpaceWeatherEvent) => void;
+  isVisible?: boolean;
 }
 
-export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorProps) {
+export function SpaceWeatherMonitor({ onThreatDetected, onEventSelect, isVisible = true }: SpaceWeatherMonitorProps) {
   const [events, setEvents] = useState<SpaceWeatherEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,85 +28,72 @@ export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorPro
       setLoading(true);
       setError(null);
       
-      console.log('🌍 Fetching space weather data from NASA DONKI...');
-      
-      // Build a reasonable date window (past 7 days) to avoid backend 500s
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000)
       const toIso = (d: Date) => d.toISOString().split('T')[0]
       const params = `?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`
 
-      // Fetch CME events
       const cmeResponse = await fetch(`/api/donki/DONKI/WS/get/CME${params}`);
       const cmeData = cmeResponse.ok ? await cmeResponse.json() : [];
       
-      // Fetch Solar Flares
       const flareResponse = await fetch(`/api/donki/DONKI/WS/get/FLR${params}`);
       const flareData = flareResponse.ok ? await flareResponse.json() : [];
       
-      // Fetch Geomagnetic Storms
       const gstResponse = await fetch(`/api/donki/DONKI/WS/get/GST${params}`);
       const gstData = gstResponse.ok ? await gstResponse.json() : [];
       
-      console.log('📡 NASA DONKI data:', { cme: cmeData.length, flares: flareData.length, storms: gstData.length });
-      
-      // Process events
       const processedEvents: SpaceWeatherEvent[] = [];
       
       // Process CME events
-      cmeData.slice(0, 3).forEach((cme: any, index: number) => {
+      cmeData.slice(0, 5).forEach((cme: any, index: number) => {
+        const speed = cme?.cmeAnalyses?.find?.((a: any) => a?.isMostAccurate) ?.speed || cme?.speed
         processedEvents.push({
-          id: `cme_${index}`,
+          id: `cme_${cme.activityID || index}`,
           type: 'CME',
           title: `Coronal Mass Ejection`,
           description: cme.note || 'CME detected in solar wind',
-          severity: cme.speed ? (cme.speed > 1000 ? 'High' : 'Medium') : 'Low',
+          severity: speed ? (speed > 1000 ? 'High' : 'Medium') : 'Low',
           timestamp: cme.startTime || new Date().toISOString(),
-          impact: cme.speed ? `Speed: ${cme.speed} km/s` : undefined
+          impact: speed ? `Speed: ${speed} km/s` : undefined,
+          source: cme
         });
       });
       
       // Process Solar Flares
-      flareData.slice(0, 2).forEach((flare: any, index: number) => {
+      flareData.slice(0, 5).forEach((flare: any, index: number) => {
         processedEvents.push({
-          id: `flare_${index}`,
+          id: `flare_${flare.flrID || index}`,
           type: 'Solar Flare',
           title: `Solar Flare ${flare.classType || 'M-Class'}`,
           description: flare.flrID || 'Solar flare detected',
           severity: flare.classType?.includes('X') ? 'High' : flare.classType?.includes('M') ? 'Medium' : 'Low',
           timestamp: flare.beginTime || new Date().toISOString(),
-          impact: flare.classType ? `Class: ${flare.classType}` : undefined
+          impact: flare.classType ? `Class: ${flare.classType}` : undefined,
+          source: flare
         });
       });
       
       // Process Geomagnetic Storms
-      gstData.slice(0, 2).forEach((storm: any, index: number) => {
+      gstData.slice(0, 5).forEach((storm: any, index: number) => {
+        const kp = storm.kpIndex
         processedEvents.push({
-          id: `storm_${index}`,
+          id: `storm_${storm.gstID || index}`,
           type: 'Geomagnetic Storm',
           title: `Geomagnetic Storm`,
           description: storm.gstID || 'Geomagnetic activity detected',
-          severity: storm.kpIndex ? (storm.kpIndex > 7 ? 'High' : storm.kpIndex > 5 ? 'Medium' : 'Low') : 'Low',
+          severity: kp ? (kp > 7 ? 'High' : kp > 5 ? 'Medium' : 'Low') : 'Low',
           timestamp: storm.startTime || new Date().toISOString(),
-          impact: storm.kpIndex ? `Kp Index: ${storm.kpIndex}` : undefined
+          impact: kp ? `Kp Index: ${kp}` : undefined,
+          source: storm
         });
       });
       
       setEvents(processedEvents);
-      
-      // Check for high-severity events
-      const criticalEvents = processedEvents.filter(event => event.severity === 'High' || event.severity === 'Critical');
-      criticalEvents.forEach(event => {
-        onThreatDetected?.(event);
-      });
-      
-      console.log(`✅ Processed ${processedEvents.length} space weather events`);
-      
+      processedEvents
+        .filter(e => e.severity === 'High' || e.severity === 'Critical')
+        .forEach(e => onThreatDetected?.(e));
     } catch (error) {
-      console.error('❌ Failed to fetch space weather events:', error);
       setError('Failed to fetch space weather data');
-      
-      // Fallback to mock data
       const mockEvents: SpaceWeatherEvent[] = [
         {
           id: 'mock_1',
@@ -130,10 +120,9 @@ export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorPro
     }
   };
 
-  // Auto-refresh every 5 minutes
   useEffect(() => {
     fetchSpaceWeatherEvents();
-    const interval = setInterval(fetchSpaceWeatherEvents, 300000); // 5 minutes
+    const interval = setInterval(fetchSpaceWeatherEvents, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -157,6 +146,11 @@ export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorPro
     }
   };
 
+  // If not visible, just return null (but data still loads in background via useEffect)
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <div style={{
       background: 'rgba(255, 255, 255, 0.1)',
@@ -167,34 +161,23 @@ export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorPro
       <h2 style={{ color: '#64b5f6', marginBottom: '1rem' }}>
         🌍 Space Weather Monitor
       </h2>
-      
       {loading && (
         <div style={{ textAlign: 'center', padding: '1rem' }}>
           <p>🌍 Loading space weather data...</p>
         </div>
       )}
-      
       {error && (
-        <div style={{
-          background: 'rgba(244, 67, 54, 0.2)',
-          border: '1px solid #f44336',
-          borderRadius: '8px',
-          padding: '1rem',
-          marginBottom: '1rem'
-        }}>
+        <div style={{ background: 'rgba(244, 67, 54, 0.2)', border: '1px solid #f44336', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
           <p style={{ color: '#f44336', margin: 0 }}>⚠️ {error}</p>
         </div>
       )}
-      
       <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
         {events.map((event) => (
-          <div key={event.id} style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '1rem',
-            borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            marginBottom: '0.8rem'
-          }}>
+          <div key={event.id}
+            onClick={() => onEventSelect?.(event)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.1)', marginBottom: '0.8rem', cursor: 'pointer'
+            }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
               <span style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}>
                 {getTypeIcon(event.type)}
@@ -202,52 +185,23 @@ export function SpaceWeatherMonitor({ onThreatDetected }: SpaceWeatherMonitorPro
               <h4 style={{ color: '#64b5f6', margin: 0, fontSize: '0.9rem' }}>
                 {event.title}
               </h4>
-              <span style={{
-                marginLeft: 'auto',
-                padding: '0.2rem 0.5rem',
-                background: getSeverityColor(event.severity),
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                fontWeight: 'bold'
-              }}>
+              <span style={{ marginLeft: 'auto', padding: '0.2rem 0.5rem', background: getSeverityColor(event.severity), borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>
                 {event.severity}
               </span>
             </div>
-            
-            <p style={{ fontSize: '0.8rem', opacity: 0.8, margin: '0.3rem 0' }}>
-              {event.description}
-            </p>
-            
+            <p style={{ fontSize: '0.8rem', opacity: 0.8, margin: '0.3rem 0' }}>{event.description}</p>
             {event.impact && (
-              <p style={{ fontSize: '0.8rem', opacity: 0.7, margin: '0.3rem 0' }}>
-                Impact: {event.impact}
-              </p>
+              <p style={{ fontSize: '0.8rem', opacity: 0.7, margin: '0.3rem 0' }}>Impact: {event.impact}</p>
             )}
-            
-            <p style={{ fontSize: '0.7rem', opacity: 0.6, margin: '0.3rem 0 0 0' }}>
-              {new Date(event.timestamp).toLocaleString()}
-            </p>
+            <p style={{ fontSize: '0.7rem', opacity: 0.6, margin: '0.3rem 0 0 0' }}>{new Date(event.timestamp).toLocaleString()}</p>
           </div>
         ))}
       </div>
-      
-      {events.length === 0 && !loading && (
-        <div style={{ textAlign: 'center', opacity: 0.6, padding: '1rem' }}>
-          <p>No space weather events detected</p>
-        </div>
-      )}
-      
       <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
         <h4 style={{ color: '#64b5f6', margin: '0 0 0.5rem 0' }}>Data Sources</h4>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-          • NASA DONKI: CME, Solar Flares, Geomagnetic Storms
-        </p>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-          • Updates: Every 5 minutes
-        </p>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-          • Events Monitored: {events.length}
-        </p>
+        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>• NASA DONKI: CME, Solar Flares, Geomagnetic Storms</p>
+        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>• Updates: Every 5 minutes</p>
+        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>• Events Monitored: {events.length}</p>
       </div>
     </div>
   );

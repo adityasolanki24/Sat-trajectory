@@ -20,10 +20,17 @@ export default defineConfig({
         target: 'http://localhost:5174',
         changeOrigin: true
       },
+      '/api/assistant': {
+        target: 'http://localhost:5174',
+        changeOrigin: true
+      },
+      '/api/tle': {
+        target: 'http://localhost:5174',
+        changeOrigin: true
+      },
       '/api/celestrak': {
-        target: 'https://celestrak.org',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/celestrak/, '')
+        target: 'http://localhost:5174',
+        changeOrigin: true
       },
       '/api/donki': {
         target: 'https://kauai.ccmc.gsfc.nasa.gov',
