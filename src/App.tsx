@@ -636,41 +636,41 @@ function App() {
           }
         };
 
-        // Try new Space-Track-based API first
-        const urls = [
-          '/api/tle/group/stations?limit=12',
-          '/api/tle/group/active?limit=12'
+        // Load only specific satellites: ISS, OUTPOST MISSION 1, AISSAT 2
+        const noradIds = [
+          25544, // ISS (ZARYA)
+          56226, // OUTPOST MISSION 1
+          40075  // AISSAT 2
         ];
 
-        let response: Response | null = null;
-        for (const url of urls) {
-          try {
-            const res = await tryFetch(url, 10000);
-            if (res.ok) { response = res; break; }
-          } catch (_) {}
-        }
-        if (!response || !response.ok) throw new Error('All Celestrak attempts failed');
-
         let parsedSatellites: Satellite[] = []
-        try {
-          const tleData: any[] = await response.json();
-          if (Array.isArray(tleData) && tleData.length) {
-            // Space-Track returns objects with OBJECT_NAME, TLE_LINE1, TLE_LINE2
-            parsedSatellites = tleData
-              .filter((d: any) => d.TLE_LINE1 && d.TLE_LINE2) // Must have valid TLEs
-              .slice(0, 12)
-          .map((data: any, index: number) => parseFromTLE(data, index))
-          .filter(Boolean) as Satellite[];
-            
-            if (parsedSatellites.length === 0) {
-              throw new Error('No valid TLE data in response')
+        
+        for (const noradId of noradIds) {
+          try {
+            const res = await tryFetch(`/api/tle/satellite/${noradId}`, 10000);
+            if (res.ok) {
+              const tleText = await res.text();
+              const lines = tleText.trim().split('\n');
+              if (lines.length >= 3) {
+                const data = {
+                  OBJECT_NAME: lines[0].trim(),
+                  TLE_LINE1: lines[1].trim(),
+                  TLE_LINE2: lines[2].trim(),
+                  NORAD_CAT_ID: noradId.toString()
+                };
+                const sat = parseFromTLE(data, parsedSatellites.length);
+                if (sat) {
+                  parsedSatellites.push(sat);
+                }
+              }
             }
-          } else {
-            throw new Error('Invalid TLE data format')
+          } catch (e) {
+            console.warn(`Failed to load NORAD ${noradId}:`, e);
           }
-        } catch (e) {
-          console.warn('Failed to load live TLE data:', e)
-          throw new Error('Failed to obtain live TLEs')
+        }
+
+        if (parsedSatellites.length === 0) {
+          throw new Error('Failed to load any satellites')
         }
 
         setSatellites(parsedSatellites);
