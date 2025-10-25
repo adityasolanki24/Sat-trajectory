@@ -31,16 +31,24 @@ export function SpaceWeatherMonitor({ onThreatDetected, onEventSelect, isVisible
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000)
       const toIso = (d: Date) => d.toISOString().split('T')[0]
-      const params = `?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`
 
-      const cmeResponse = await fetch(`/api/donki/WS/get/CME${params}`);
+      console.log('[SpaceWeather] Fetching CME data...');
+      const cmeResponse = await fetch(`/api/donki/CME?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`);
+      console.log('[SpaceWeather] CME response status:', cmeResponse.status);
       const cmeData = cmeResponse.ok ? await cmeResponse.json() : [];
+      console.log('[SpaceWeather] CME events:', cmeData.length);
       
-      const flareResponse = await fetch(`/api/donki/WS/get/FLR${params}`);
+      console.log('[SpaceWeather] Fetching FLR data...');
+      const flareResponse = await fetch(`/api/donki/FLR?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`);
+      console.log('[SpaceWeather] FLR response status:', flareResponse.status);
       const flareData = flareResponse.ok ? await flareResponse.json() : [];
+      console.log('[SpaceWeather] FLR events:', flareData.length);
       
-      const gstResponse = await fetch(`/api/donki/WS/get/GST${params}`);
+      console.log('[SpaceWeather] Fetching GST data...');
+      const gstResponse = await fetch(`/api/donki/GST?startDate=${toIso(startDate)}&endDate=${toIso(endDate)}`);
+      console.log('[SpaceWeather] GST response status:', gstResponse.status);
       const gstData = gstResponse.ok ? await gstResponse.json() : [];
+      console.log('[SpaceWeather] GST events:', gstData.length);
       
       const processedEvents: SpaceWeatherEvent[] = [];
       

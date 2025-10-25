@@ -541,7 +541,7 @@ Example space weather: {"title":"SPACE WEATHER ALERT","rationale":"Critical CME 
 const handleDonkiRequest = async (req: express.Request, res: express.Response, eventType: string) => {
   try {
     const { startDate, endDate } = req.query
-    const donkiUrl = `https://api.nasa.gov/DONKI/WS/get/${eventType}?startDate=${startDate}&endDate=${endDate}&api_key=DEMO_KEY`
+    const donkiUrl = `https://api.nasa.gov/DONKI/${eventType}?startDate=${startDate}&endDate=${endDate}&api_key=DEMO_KEY`
     
     console.log(`[DONKI] Fetching ${eventType}:`, donkiUrl)
     
@@ -565,9 +565,9 @@ const handleDonkiRequest = async (req: express.Request, res: express.Response, e
   }
 }
 
-app.get('/api/donki/WS/get/CME', (req, res) => handleDonkiRequest(req, res, 'CME'))
-app.get('/api/donki/WS/get/FLR', (req, res) => handleDonkiRequest(req, res, 'FLR'))
-app.get('/api/donki/WS/get/GST', (req, res) => handleDonkiRequest(req, res, 'GST'))
+app.get('/api/donki/CME', (req, res) => handleDonkiRequest(req, res, 'CME'))
+app.get('/api/donki/FLR', (req, res) => handleDonkiRequest(req, res, 'FLR'))
+app.get('/api/donki/GST', (req, res) => handleDonkiRequest(req, res, 'GST'))
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true })

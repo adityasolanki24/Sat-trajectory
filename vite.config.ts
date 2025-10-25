@@ -33,9 +33,10 @@ export default defineConfig({
         changeOrigin: true
       },
       '/api/donki': {
-        target: 'https://kauai.ccmc.gsfc.nasa.gov',
+        target: 'https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/donki/, '')
+        rewrite: (path) => path.replace(/^\/api\/donki/, ''),
+        secure: false
       },
       '/api/n2yo': {
         target: 'https://api.n2yo.com',
