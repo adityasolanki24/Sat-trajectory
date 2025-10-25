@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.6",
+    "@react-three/drei": "9.74.6",
     "@react-three/fiber": "^9.4.0",
     "axios": "^1.7.7",
     "axios-cookiejar-support": "^6.0.2",
