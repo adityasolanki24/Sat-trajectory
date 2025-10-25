@@ -544,20 +544,26 @@ app.get('/api/donki/*', async (req, res) => {
     const queryString = req.url.split('?')[1] || ''
     const donkiUrl = `https://api.nasa.gov/DONKI/${donkiPath}?${queryString}&api_key=DEMO_KEY`
     
-    console.log(`[DONKI] Fetching: ${donkiPath}`)
+    console.log(`[DONKI] Fetching: ${donkiUrl}`)
     
-    const response = await fetch(donkiUrl)
-    const data = await response.json()
+    const response = await axios.get(donkiUrl, {
+      timeout: 10000,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'SatelliteTracker/1.0'
+      }
+    })
     
-    if (!response.ok) {
-      console.error('[DONKI] API error:', response.status, data)
-      return res.status(response.status).json(data)
-    }
-    
-    res.json(data)
+    console.log(`[DONKI] Success: ${donkiPath}`)
+    res.json(response.data)
   } catch (error: any) {
     console.error('[DONKI] Proxy error:', error.message)
-    res.status(500).json({ error: 'Failed to fetch space weather data' })
+    if (error.response) {
+      console.error('[DONKI] Response status:', error.response.status)
+      console.error('[DONKI] Response data:', error.response.data)
+      return res.status(error.response.status).json(error.response.data)
+    }
+    res.status(500).json({ error: 'Failed to fetch space weather data', message: error.message })
   }
 })
 
