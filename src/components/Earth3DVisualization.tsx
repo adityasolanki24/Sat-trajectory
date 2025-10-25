@@ -19,7 +19,7 @@ type AffectedArea = { latThresholdDeg: number; color?: number; opacity?: number 
 
 type ConjunctionPoint = { lat: number; lon: number; altKm: number; tca: string }
 
-export function Earth3DVisualization({ liveSatellites = [] as LiveSat[], orbitPaths = [] as OrbitPath[], links = [] as Link[], autoRotate = false, onSelectSatellite, affectedArea, conjunctionPoint }: { liveSatellites?: LiveSat[]; orbitPaths?: OrbitPath[]; links?: Link[]; autoRotate?: boolean; onSelectSatellite?: (id: string) => void; affectedArea?: AffectedArea; conjunctionPoint?: ConjunctionPoint | null; eciLiveSatellites?: LiveSatEci[]; eciOrbitTrails?: OrbitPathEci[]; gmstRad?: number }) {
+export function Earth3DVisualization({ liveSatellites = [] as LiveSat[], orbitPaths = [] as OrbitPath[], links = [] as Link[], autoRotate = false, onSelectSatellite, affectedArea, conjunctionPoint, gmstRad = 0 }: { liveSatellites?: LiveSat[]; orbitPaths?: OrbitPath[]; links?: Link[]; autoRotate?: boolean; onSelectSatellite?: (id: string) => void; affectedArea?: AffectedArea; conjunctionPoint?: ConjunctionPoint | null; eciLiveSatellites?: LiveSatEci[]; eciOrbitTrails?: OrbitPathEci[]; gmstRad?: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const satMeshGroupRef = useRef<THREE.Group | null>(null);
   const orbitGroupRef = useRef<THREE.Group | null>(null);

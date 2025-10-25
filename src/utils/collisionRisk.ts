@@ -137,9 +137,9 @@ export function estimateManeuverWindow(
   nextWindowMinutes: number;
   windowDescription: string;
 } {
-  const earthRadius = 6371;
-  const mu = 398600.4418;
-  const r = earthRadius + altitudeKm;
+  // const earthRadius = 6371;
+  // const mu = 398600.4418;
+  // const r = earthRadius + altitudeKm;
   
   // Calculate orbital period (currently unused)
   // const periodMinutes = 2 * Math.PI * Math.sqrt(Math.pow(r, 3) / mu) / 60;
