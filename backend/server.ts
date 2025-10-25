@@ -565,8 +565,14 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true })
 })
 
-app.listen(port, () => {
-  console.log(`[spacetrack-backend] listening on http://localhost:${port}`)
-})
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`[spacetrack-backend] listening on http://localhost:${port}`)
+  })
+}
+
+// Export for Vercel serverless
+export default app
 
 
