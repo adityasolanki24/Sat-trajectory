@@ -1,4 +1,4 @@
-# 🛰️ Sat Trajectory — SpaceX‑inspired Satellite Monitoring
+# 🛰️ Sat Trajectory —  Satellite Monitoring
 
 TypeScript + React app with a Node/Express proxy. Features real Conjunction Data (Space‑Track), accurate orbit propagation (satellite.js), 3D/2D views, space weather (NASA DONKI), and N2YO add‑satellite.
 
