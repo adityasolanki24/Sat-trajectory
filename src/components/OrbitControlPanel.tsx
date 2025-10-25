@@ -72,7 +72,7 @@ export function OrbitControlPanel({ satellite, onApplyManeuver, onClose, collisi
     const mu = 398600.4418; // Earth's gravitational parameter (km³/s²)
     const n = meanMotion * 2 * Math.PI / 86400; // Convert rev/day to rad/s
     const a = Math.pow(mu / (n * n), 1/3); // Semi-major axis in km
-    const altitudeKm = a - 6371; // Approximate altitude
+    // const altitudeKm = a - 6371; // Approximate altitude (unused)
     
     setElements({
       semiMajorAxisKm: a,

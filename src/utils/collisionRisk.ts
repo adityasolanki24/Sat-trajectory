@@ -18,7 +18,7 @@ export interface CollisionRisk {
  */
 export function calculateCollisionProbability(
   missDistanceKm: number,
-  relativeVelocityKmS: number,
+  _relativeVelocityKmS: number, // Unused in current implementation
   primaryRadiusKm: number = 0.01, // ~10m typical satellite
   secondaryRadiusKm: number = 0.01
 ): number {
@@ -77,7 +77,7 @@ export function assessRiskLevel(
 export function calculateAvoidanceManeuver(
   currentAltitudeKm: number,
   missDistanceKm: number,
-  timeToTcaMinutes: number
+  _timeToTcaMinutes: number // Unused in current implementation
 ): {
   altitudeChangeKm: number;
   deltaVMs: number;
@@ -141,8 +141,8 @@ export function estimateManeuverWindow(
   const mu = 398600.4418;
   const r = earthRadius + altitudeKm;
   
-  // Calculate orbital period
-  const periodMinutes = 2 * Math.PI * Math.sqrt(Math.pow(r, 3) / mu) / 60;
+  // Calculate orbital period (currently unused)
+  // const periodMinutes = 2 * Math.PI * Math.sqrt(Math.pow(r, 3) / mu) / 60;
   
   // Assume ground station contact every ~90 minutes (simplified)
   const nextContactMinutes = 45; // Average time to next pass

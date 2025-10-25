@@ -25,7 +25,8 @@ export const AssistantPanel: React.FC<AssistantPanelProps> = ({ buildState, onEx
   const [hasEmergency, setHasEmergency] = useState(false)
   const lastStateRef = React.useRef<string>('')
 
-  const canExec = useMemo(() => !!resp && resp.commands && resp.commands.length > 0, [resp])
+  // Check if there are executable commands
+  // const canExec = useMemo(() => !!resp && resp.commands && resp.commands.length > 0, [resp])
 
   // Auto-trigger AI when threats are detected
   React.useEffect(() => {

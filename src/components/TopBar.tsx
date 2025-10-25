@@ -1,5 +1,3 @@
-import React from 'react'
-
 type TabKey = 'dashboard' | '3d' | '2d' | 'conjunctions' | 'weather' | 'settings'
 
 export function TopBar({ active, onChange }: { active: TabKey; onChange: (k: TabKey) => void }) {

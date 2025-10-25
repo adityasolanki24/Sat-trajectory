@@ -28,7 +28,7 @@ export function useConjunctions(range: string = 'now-3') {
     let mounted = true
     setLoading(true)
     setError(null)
-    fetchConjunctions(range)
+    fetchConjunctions()
       .then(resp => {
         if (!mounted) return
         if (Array.isArray(resp)) {
@@ -40,8 +40,8 @@ export function useConjunctions(range: string = 'now-3') {
             return { ...it, missDistanceMeters: mdMeters, missDistanceKm: mdKm, relativeSpeedKms: rvKms, severity }
           })
           setData(withSeverity)
-        } else if (resp?.normalized && Array.isArray(resp.items)) {
-          const withSeverity: Conjunction[] = resp.items.map((it: any) => {
+        } else if (resp && typeof resp === 'object' && 'normalized' in resp && 'items' in resp && Array.isArray((resp as any).items)) {
+          const withSeverity: Conjunction[] = ((resp as any).items as any[]).map((it: any) => {
             const mdKm = typeof it.missDistanceKm === 'number' ? it.missDistanceKm : (typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters / 1000 : undefined)
             const rvKms = typeof it.relativeSpeedKms === 'number' ? it.relativeSpeedKms : undefined
             const mdMeters = typeof it.missDistanceMeters === 'number' ? it.missDistanceMeters : (typeof mdKm === 'number' ? mdKm * 1000 : parseMissDistanceToMeters(it?.raw?.MISS_DISTANCE))
