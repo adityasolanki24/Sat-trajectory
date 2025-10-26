@@ -446,6 +446,5 @@ MIT License - Built for educational purposes
 
 ---
 
-**Built with for ANT61 Hackathon** 
-=======
->>>>>>> 0194e8b134cf46bf0c32bcd08aa0fc2204e9b5ef
+**Built for ANT61 Hackathon** 
+
