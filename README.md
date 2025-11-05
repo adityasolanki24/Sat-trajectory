@@ -1,4 +1,4 @@
-# 🛰️ Satellite Trajectory Monitor - ANT61 Hackathon
+# Satellite Trajectory Monitor - ANT61 Hackathon
 
 A professional-grade satellite tracking and collision avoidance system with AI-powered decision support. Built with TypeScript, React, Three.js, Node.js, and LLM integration for autonomous space operations.
 
