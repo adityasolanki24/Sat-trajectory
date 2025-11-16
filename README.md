@@ -1,4 +1,6 @@
-# Satellite Trajectory Monitor - ANT61 Hackathon
+# Satellite Trajectory Monitor
+
+**Winner of 2nd Place at ANT61xUSRC Hackathon**
 
 A professional-grade satellite tracking and collision avoidance system with AI-powered decision support. Built with TypeScript, React, Three.js, Node.js, and LLM integration for autonomous space operations.
 
@@ -8,7 +10,7 @@ A professional-grade satellite tracking and collision avoidance system with AI-p
 ![Three.js](https://img.shields.io/badge/Three.js-0.159-black)
 ![AI Powered](https://img.shields.io/badge/AI-Powered-orange)
 
-## 🌟 Features
+## Features
 
 ### Core Capabilities
 - **3D Earth Visualization**: Interactive globe with draggable camera, zoom, and real-time satellite rendering
@@ -34,7 +36,7 @@ A professional-grade satellite tracking and collision avoidance system with AI-p
 - **NASA DONKI**: Coronal Mass Ejections (CME), Solar Flares, Geomagnetic Storms
 - **satellite.js**: SGP4/SDP4 orbital propagation algorithms
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
@@ -80,7 +82,7 @@ npm run dev         # Frontend on http://localhost:5173
 
 Visit [http://localhost:5173](http://localhost:5173) to see the application.
 
-## 🚀 Deployment
+## Deployment
 
 Ready to deploy? See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for complete deployment guide.
 
@@ -116,7 +118,7 @@ vercel --prod
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Sat-trajectory/
@@ -149,7 +151,7 @@ Sat-trajectory/
 └── README.md                  # This file
 ```
 
-## 🎯 Usage Guide
+## Usage Guide
 
 ### Dashboard Tab
 - **3D Globe**: Drag to rotate, scroll to zoom, click satellites to select
@@ -223,7 +225,7 @@ Sat-trajectory/
 - **Perfect for**: Hackathon presentations, demonstrations without live API data
 - **Disable**: Click "DEMO MODE ON" to turn off and clear simulated threats
 
-## 🔧 Architecture
+## Architecture
 
 ### Frontend (React + Vite)
 - **React 18**: Component-based UI with hooks and state management
@@ -274,7 +276,7 @@ Sat-trajectory/
 8. LLM returns structured commands (JSON)
 9. Frontend executes commands via `executeAssistantPlan`
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Backend Endpoints (via `/api/*`)
 
@@ -334,7 +336,7 @@ Response: {
 }
 ```
 
-## 🛡️ Security Notes
+## Security Notes
 
 - **Space-Track credentials** stored only in backend `.env` file (never in frontend)
 - **AI API keys** (OpenAI/OpenRouter/AI/ML) secured server-side
@@ -343,7 +345,7 @@ Response: {
 - Credentials never exposed in browser or client code
 - LLM prompts sanitized to prevent injection attacks
 
-## 🏗️ Build & Deploy
+## Build & Deploy
 
 ### Development Build
 ```bash
@@ -362,7 +364,7 @@ npm run preview
 3. Serve `dist/` directory as static files
 4. Configure reverse proxy to route `/api/*` to backend
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "You must be logged in" error
 - Check Space-Track credentials in `.env` (must be in `Sat-trajectory/.env`, not project root)
@@ -407,7 +409,7 @@ npm run preview
 - Extreme parameter changes may fail validation
 - Try smaller adjustments (e.g., ±5km altitude instead of ±50km)
 
-## 🤝 Contributing
+## Contributing
 
 This project was built for the ANT61 Hackathon. Contributions welcome!
 
@@ -417,11 +419,11 @@ This project was built for the ANT61 Hackathon. Contributions welcome!
 4. Push to branch: `git push origin feature-name`
 5. Submit pull request
 
-## 📄 License
+## License
 
 MIT License - Built for educational purposes
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Space-Track.org**: Conjunction Data Messages and TLE data
 - **CelesTrak**: Satellite catalog and TLE data
@@ -431,7 +433,7 @@ MIT License - Built for educational purposes
 - **OpenAI / OpenRouter / AI/ML API**: LLM infrastructure for AI assistant
 - **ANT61 Hackathon**: For the opportunity to build this autonomous space operations system
 
-## 📚 Additional Documentation
+## Additional Documentation
 
 ### Core Documentation
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) - Detailed system architecture and design decisions
